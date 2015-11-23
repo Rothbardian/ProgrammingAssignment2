@@ -2,22 +2,29 @@
 ## functions do
 
 ## This function creates a special "matrix" object that can cache its inverse.
-## I did not start this assignment soon enough to understand and complete it. 
-## Save your time and mark it a '0'.
+
 
 makeCacheMatrix <- function(x = matrix()) {
 
-    m <- NULL
-    set <- function(y) {
+    ## @x: a square invertible matrix
+    ## return: a list containing functions to
+    ##              1. set the matrix
+    ##              2. get the matrix
+    ##              3. set the inverse
+    ##              4. get the inverse
+    ##         this list is used as the input to cacheSolve()
+    
+    inv = NULL
+    set = function(y) {
+        # use `<<-` to assign a value to an object in an environment 
+        # different from the current environment. 
         x <<- y
-        m <<- NULL
+        inv <<- NULL
     }
-    get <- function() x
-    setmean <- function(mean) m <<- mean
-    getmean <- function() m
-    list(set = set, get = get,
-         setmean = setmean,
-         getmean = getmean)
+    get = function() x
+    setinv = function(inverse) inv <<- inverse 
+    getinv = function() inv
+    list(set=set, get=get, setinv=setinv, getinv=getinv)
 }
 
 
@@ -27,14 +34,24 @@ makeCacheMatrix <- function(x = matrix()) {
 ## from the cache.
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
-    m <- x$getmean()
-    if(!is.null(m)) {
+    ## @x: output of makeCacheMatrix()
+    ## return: inverse of the original matrix input to makeCacheMatrix()
+    
+    inv = x$getinv()
+    
+    # if the inverse has already been calculated
+    if (!is.null(inv)){
+        # get it from the cache and skips the computation. 
         message("getting cached data")
-        return(m)
+        return(inv)
     }
-    data <- x$get()
-    m <- mean(data, ...)
-    x$setmean(m)
-    m
+    
+    # otherwise, calculates the inverse 
+    mat.data = x$get()
+    inv = solve(mat.data, ...)
+    
+    # sets the value of the inverse in the cache via the setinv function.
+    x$setinv(inv)
+    
+    return(inv)
 }
